@@ -1,0 +1,19 @@
+diff --git a//dev/null b/style.css
+index 0000000000000000000000000000000000000000..62162d95b8ef0dada88911245924d2d99619ac29 100644
+--- a//dev/null
++++ b/style.css
+@@ -0,0 +1,14 @@
++body {
++  font-family: Arial, sans-serif;
++  width: 300px;
++  padding: 10px;
++}
++#task-list {
++  list-style: none;
++  padding: 0;
++}
++#task-list li {
++  display: flex;
++  justify-content: space-between;
++  margin-bottom: 5px;
++}
