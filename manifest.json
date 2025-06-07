@@ -1,11 +1,16 @@
-{
-  "manifest_version": 3,
-  "name": "Todo Pomodoro",
-  "description": "A simple todo list combined with a Pomodoro timer.",
-  "version": "1.0.0",
-  "action": {
-    "default_popup": "popup.html",
-    "default_title": "Todo Pomodoro"
-  },
-  "permissions": ["storage"]
-}
+diff --git a//dev/null b/manifest.json
+index 0000000000000000000000000000000000000000..d09e74d53dba34dfd2db9560b7910d78fd9de0b1 100644
+--- a//dev/null
++++ b/manifest.json
+@@ -0,0 +1,11 @@
++{
++  "manifest_version": 3,
++  "name": "Todo Pomodoro",
++  "description": "A simple todo list combined with a Pomodoro timer.",
++  "version": "1.0.0",
++  "action": {
++    "default_popup": "popup.html",
++    "default_title": "Todo Pomodoro"
++  },
++  "permissions": ["storage"]
++}
