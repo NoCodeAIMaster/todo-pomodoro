@@ -1,16 +1,162 @@
 body {
   font-family: Arial, sans-serif;
-  width: 300px;
-  padding: 10px;
+  width: 320px;
+  padding: 15px;
+  background-color: #e0f7fa;
+  color: #004d40;
+}
+
+h1 {
+  font-size: 1.5em;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
 #task-list {
   list-style: none;
   padding: 0;
+  margin: 10px 0;
 }
 
 #task-list li {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
+
+button {
+  background-color: #00acc1;
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #00838f;
+}
+
+input[type="text"], input[type="number"] {
+  width: 65%;
+  padding: 5px;
+  margin-bottom: 6px;
+}
+
+// --- popup.js ---
+const taskInput = document.getElementById('new-task');
+const addTaskBtn = document.getElementById('add-task');
+const taskList = document.getElementById('task-list');
+const setsInput = document.getElementById('sets');
+
+const timerDisplay = document.getElementById('timer-display');
+const startStopBtn = document.getElementById('start-stop');
+const resetBtn = document.getElementById('reset');
+
+let tasks = [];
+let running = false;
+let timeLeft = 25 * 60;
+let interval = null;
+let totalSets = 1;
+let completedSets = 0;
+
+function renderTasks() {
+  taskList.innerHTML = '';
+  tasks.forEach((task, index) => {
+    const li = document.createElement('li');
+    li.textContent = task;
+    const btn = document.createElement('button');
+    btn.textContent = 'x';
+    btn.onclick = () => {
+      tasks.splice(index, 1);
+      chrome.storage.sync.set({ tasks });
+      renderTasks();
+    };
+    li.appendChild(btn);
+    taskList.appendChild(li);
+  });
+}
+
+function updateTimerDisplay() {
+  const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+  const sec = String(timeLeft % 60).padStart(2, '0');
+  timerDisplay.textContent = `${min}:${sec}`;
+}
+
+function loadState() {
+  chrome.storage.sync.get(['tasks', 'timeLeft', 'running', 'sets', 'completed'], (res) => {
+    tasks = res.tasks || [];
+    timeLeft = res.timeLeft ?? 25 * 60;
+    running = res.running || false;
+    totalSets = res.sets || 1;
+    completedSets = res.completed || 0;
+    renderTasks();
+    updateTimerDisplay();
+  });
+}
+
+function saveState() {
+  chrome.storage.sync.set({
+    tasks,
+    timeLeft,
+    running,
+    sets: totalSets,
+    completed: completedSets
+  });
+}
+
+addTaskBtn.onclick = () => {
+  const value = taskInput.value.trim();
+  if (value) {
+    tasks.push(value);
+    taskInput.value = '';
+    saveState();
+    renderTasks();
+  }
+};
+
+startStopBtn.onclick = () => {
+  if (running) {
+    clearInterval(interval);
+    running = false;
+  } else {
+    interval = setInterval(() => {
+      if (timeLeft > 0) {
+        timeLeft--;
+        updateTimerDisplay();
+        saveState();
+      } else {
+        clearInterval(interval);
+        running = false;
+        completedSets++;
+        if (completedSets >= totalSets) {
+          new Audio('alarm.mp3').play();
+        } else {
+          timeLeft = 25 * 60;
+          updateTimerDisplay();
+        }
+        saveState();
+      }
+    }, 1000);
+    running = true;
+  }
+  saveState();
+};
+
+resetBtn.onclick = () => {
+  clearInterval(interval);
+  running = false;
+  timeLeft = 25 * 60;
+  completedSets = 0;
+  totalSets = parseInt(setsInput.value) || 1;
+  updateTimerDisplay();
+  saveState();
+};
+
+loadState();
+
+// --- background.js ---
+// Keep service worker alive and allow persistent timer logic (if needed).
+chrome.runtime.onInstalled.addListener(() => {
+  console.log('Todo Pomodoro installed.');
+});
