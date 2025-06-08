@@ -6,9 +6,12 @@ const timerDisplay = document.getElementById('timer-display');
 const startStopBtn = document.getElementById('start-stop');
 const resetBtn = document.getElementById('reset');
 
+// 🔊 アラーム音
+const alarmAudio = new Audio('alarm.mp3');
+
 let tasks = [];
 let timer = null;
-let timeLeft = 25 * 60; // seconds
+let timeLeft = 25 * 60; // 25分
 let running = false;
 
 function renderTasks() {
@@ -69,6 +72,7 @@ function tick() {
     clearInterval(timer);
     running = false;
     startStopBtn.textContent = 'Start';
+    alarmAudio.play(); // 🔔 アラーム再生
   }
 }
 
