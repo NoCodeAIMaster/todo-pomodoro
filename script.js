@@ -1,3 +1,5 @@
+// script.js
+
 const taskInput = document.getElementById('new-task');
 const addTaskBtn = document.getElementById('add-task');
 const taskList = document.getElementById('task-list');
@@ -6,13 +8,23 @@ const timerDisplay = document.getElementById('timer-display');
 const startStopBtn = document.getElementById('start-stop');
 const resetBtn = document.getElementById('reset');
 
-// 🔊 アラーム音
-const alarmAudio = new Audio('alarm.mp3');
-
 let tasks = [];
 let timer = null;
-let timeLeft = 25 * 60; // 25分
+let timeLeft = 25 * 60;
 let running = false;
+
+// 🔁 アラーム再生用（ループ）
+let alarmAudio = new Audio('alarm.mp3');
+alarmAudio.loop = true;
+
+function playAlarm() {
+  alarmAudio.play().catch(err => console.error('Alarm playback failed:', err));
+}
+
+function stopAlarm() {
+  alarmAudio.pause();
+  alarmAudio.currentTime = 0;
+}
 
 function renderTasks() {
   taskList.innerHTML = '';
@@ -36,7 +48,7 @@ function saveTasks() {
 }
 
 function loadTasks() {
-  chrome.storage.sync.get('tasks', (data) => {
+  chrome.storage.sync.get('tasks', data => {
     tasks = data.tasks || [];
     renderTasks();
   });
@@ -52,7 +64,7 @@ addTaskBtn.addEventListener('click', () => {
   }
 });
 
-taskInput.addEventListener('keydown', (e) => {
+taskInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     addTaskBtn.click();
   }
@@ -72,7 +84,7 @@ function tick() {
     clearInterval(timer);
     running = false;
     startStopBtn.textContent = 'Start';
-    alarmAudio.play(); // 🔔 アラーム再生
+    playAlarm();
   }
 }
 
@@ -93,6 +105,7 @@ resetBtn.addEventListener('click', () => {
   timeLeft = 25 * 60;
   updateTimerDisplay();
   startStopBtn.textContent = 'Start';
+  stopAlarm();
 });
 
 loadTasks();
