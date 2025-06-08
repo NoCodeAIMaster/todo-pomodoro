@@ -1,11 +1,19 @@
 {
   "manifest_version": 3,
   "name": "Todo Pomodoro",
-  "description": "A simple todo list combined with a Pomodoro timer.",
-  "version": "1.0.0",
+  "description": "A Pomodoro timer with task management and persistent background service.",
+  "version": "1.1.0",
   "action": {
     "default_popup": "popup.html",
     "default_title": "Todo Pomodoro"
   },
-  "permissions": ["storage"]
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage"],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
 }
